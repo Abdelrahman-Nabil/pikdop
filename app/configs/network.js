@@ -1,12 +1,13 @@
 const API_ENDPOINT = 'https://pikdop.herokuapp.com/'
+import isRTL from '../localization'
 
 let headers = {
-  ['Accept-Language']: 'en'
+  ['Accept-Language']: isRTL() ? 'ar' : 'en'
 }
 export default NETWORK = {
-  fetchData: (keyword) => {
+  fetchData: (keyword, page = 1) => {
     return new Promise((resolve, reject) => {
-      fetch((API_ENDPOINT + keyword), { headers })
+      fetch((API_ENDPOINT + keyword + `?page=${page}`), { headers })//additional params can be concatenated
         .then(response => response.json())
         .then(data => resolve(data))
         .catch(error => reject(error))

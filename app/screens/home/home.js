@@ -26,12 +26,19 @@ class Home extends Component {
   state = { selected: 0, data: [] }
 
   componentDidMount(){
-    this.props.fetchData('trips')
+    this.props.fetchData('trips', 1)
   }
-
+  page = 1
+  loading = false
+  hasNextPage = true
   componentWillReceiveProps(nextProps){
-    let trips = nextProps.trips
+    let data = nextProps.trips
+    let trips = data.data
     if(trips){
+      this.loading = false
+      this.hasNextPage = this.page < data.pageCount
+
+      //validate images urls
       trips.map(trip => {
         if(trip.productImage && !trip.productImage.match(/^(https:\/\/).+(.jpeg|.jpg|.png).*/)){
           delete trip.productImage
@@ -41,8 +48,11 @@ class Home extends Component {
         }
       })
       this.setState({
-        data: trips
+        data: this.state.data.concat(trips)
       })
+    } else {
+      this.loading = false
+      this.hasNextPage = false
     }
   }
   renderRightButton = () => (
@@ -107,6 +117,12 @@ class Home extends Component {
       this.setState({
         shrink: false
       })
+    }
+    /*pagination*/
+    if((y > (150 * this.page)) && !this.loading && this.hasNextPage){
+      this.loading = true
+      this.page = this.page + 1
+      this.props.fetchData('trips', this.page)
     }
   }
   render(){
